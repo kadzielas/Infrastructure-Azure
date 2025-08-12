@@ -1,0 +1,60 @@
+name: "Terraform Plan"
+on:
+  push:
+    branches:
+      - test
+      - main
+  pull_request:
+    branches:
+      - test
+      - main
+jobs:
+  scan:
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Azure login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.12.0
+
+      - name: Terraform format check
+        run: terraform fmt -check -recursive
+
+      - name: Terraform validate
+        run: terraform validate -no-color
+
+      - name: Install tfsec
+        run: |
+          curl -s https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install.sh | bash
+          echo "tfsec installed successfully"
+
+      - name: Run tfsec
+        uses: aquasecurity/tfsec@v1
+        with:
+          args: --format json --out tfsec-report.json --exclude-path '**/*.tfvars,.terraform/*'
+
+      - name: Version control
+        run: terraform version -json
+
+      - name: Initialize Terraform
+        run: terraform init -input=false -no-color
+
+      - name: Run Terraform Plan
+        run: terraform plan -out=tfplan -input=false -no-color
+
+      - name: Upload Terraform Plan
+        uses: actions/upload-artifact@v2
+        with:
+          name: tfplan
