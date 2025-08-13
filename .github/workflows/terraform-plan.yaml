@@ -14,15 +14,10 @@ on:
       - main
 jobs:
   verification-validation:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest]
     runs-on: windows-latest
     defaults:
       run:
         shell: pwsh
-        working-directory: ./terraform
     steps:
       - name: Azure login
         uses: azure/login@v1
@@ -51,10 +46,6 @@ jobs:
 
   tfsec-check:
     name: Run tfsec
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest]
     runs-on: windows-latest
 
     steps:
@@ -73,10 +64,6 @@ jobs:
 
   terraform-plan:
     name: Run Terraform Plan
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest]
     runs-on: windows-latest
 
     steps:
