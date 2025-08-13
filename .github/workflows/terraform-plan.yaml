@@ -13,12 +13,16 @@ on:
       - test
       - main
 jobs:
-  verification:
+  verification-validation:
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+        working-directory: ./terraform
     steps:
       - name: Azure login
         uses: azure/login@v1
@@ -33,6 +37,9 @@ jobs:
         with:
           terraform_version: 1.12.0
 
+      - name: terraform init
+        run: terraform init -input=false -no-color
+
       - name: Terraform format check
         run: terraform fmt -check -recursive
 
@@ -42,13 +49,13 @@ jobs:
       - name: Version control
         run: terraform version -json
 
-  tfsec-vailidation:
+  tfsec-check:
     name: Run tfsec
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: windows-latest
 
     steps:
       - name: Clone repo
@@ -70,11 +77,9 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: windows-latest
 
     steps:
-      - name: Initialize Terraform
-        run: terraform init -input=false -no-color
 
       - name: Run Terraform Plan
         run: terraform plan -out=tfplan -input=false -no-color
