@@ -49,11 +49,8 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - name: Clone repo
-        uses: actions/checkout@master
-
       - name: tfsec
-        uses: tfsec/tfsec-sarif-action@main
+        uses: tfsec/tfsec-sarif-action@v1.28.0
         with:
           sarif_file: tfsec.sarif
 
@@ -67,6 +64,11 @@ jobs:
     runs-on: windows-latest
 
     steps:
+      
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.12.0
 
       - name: Run Terraform Plan
         run: terraform plan -out=tfplan -input=false -no-color
