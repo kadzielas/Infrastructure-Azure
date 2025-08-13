@@ -58,7 +58,7 @@ jobs:
       contents: read
 
     steps:
-      
+
       - name: Clone repo
         uses: actions/checkout@v2
         with:
@@ -73,7 +73,6 @@ jobs:
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: tfsec.sarif
-          working_directory: .
 
   terraform-plan:
     name: Run Terraform Plan
