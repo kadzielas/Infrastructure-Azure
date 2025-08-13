@@ -46,7 +46,7 @@ jobs:
 
   tfsec-check:
     name: Run tfsec
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
       - name: tfsec
