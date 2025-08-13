@@ -31,7 +31,7 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v1
@@ -61,7 +61,7 @@ jobs:
     steps:
 
       - name: Clone repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           persist-credentials: false
 
@@ -80,17 +80,27 @@ jobs:
     runs-on: windows-latest
 
     steps:
+      - uses: actions/checkout@v3
+
+      - name: Get location
+        run: |
+          Get-location
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.12.0
 
+      - name: Run Terraform init
+        run: terraform init
+        working-directory: ${{ github.workspace }}
+
       - name: Run Terraform Plan
         run: terraform plan -out=tfplan -input=false -no-color
+        working-directory: ${{ github.workspace }}
 
       - name: Upload Terraform Plan
         uses: actions/upload-artifact@v4
         with:
           name: tfplan
-          path: .
+          path: ${{ github.workspace }}
